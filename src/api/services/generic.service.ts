@@ -11,7 +11,7 @@ class GenericService<T extends Document> {
     }
 
     async updateOne(filter: FilterQuery<T>, data: IUpdateCollections, fields?: string) {
-        fields = fields ? `-__v -updatedAt -deleted ${fields}` : `-__v -updatedAt -deleted`
+        fields = fields ? `-__v -updatedAt -isDeleted ${fields}` : `-__v -updatedAt -isDeleted`
         return await this.model.findOneAndUpdate(filter, data, { new: true })
             .select(fields);
     }
@@ -33,7 +33,7 @@ class GenericService<T extends Document> {
     }
 
     async findOne(filter: FilterQuery<T>, fields?: string) {
-        fields = fields ? `-__v -updatedAt -isDeleted ${fields}` : `-__v -updatedAt -isDeleted`
+        fields = fields ? `-__v -updatedAt ${fields}` : `-__v -updatedAt `
         filter = { isDeleted: false, ...filter }
         return await this.model.findOne(filter)
             .select(fields);
@@ -44,7 +44,7 @@ class GenericService<T extends Document> {
     }
 
     async findAll(filter: FilterQuery<T>, fields?: string) {
-        fields = fields ? `-__v -updatedAt -isDeleted ${fields}` : `-__v -updatedAt -isDeleted`
+        fields = fields ? `-__v -updatedAt -isisDeleted ${fields}` : `-__v -updatedAt -isisDeleted`
         const page = filter?.page ? parseInt(filter?.page) : 1;
         const resourcePerPage = filter?.limit ? parseInt(filter?.limit) : 10;
 
@@ -55,9 +55,9 @@ class GenericService<T extends Document> {
         let totalCount: number;
 
         if (filter) {
-            filter = filter?.deleted ? filter
-                : filter.hasOwnProperty('deleted')
-                    ? filter : { deleted: false, ...filter }
+            filter = filter?.isDeleted ? filter
+                : filter.hasOwnProperty('isDeleted')
+                    ? filter : { isDeleted: false, ...filter }
 
             totalCount = await this.model.countDocuments(filter);
             data = await this.model.find(filter)
@@ -66,8 +66,8 @@ class GenericService<T extends Document> {
                 .sort({ createdAt: 1 })
                 .select(fields);
         } else {
-            totalCount = await this.model.countDocuments({ deleted: false });
-            data = await this.model.find({ deleted: false })
+            totalCount = await this.model.countDocuments({ isDeleted: false });
+            data = await this.model.find({ isDeleted: false })
                 .skip((page - 1) * resourcePerPage)
                 .limit(resourcePerPage)
                 .sort({ createdAt: 1 })

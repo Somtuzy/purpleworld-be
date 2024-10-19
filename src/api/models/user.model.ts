@@ -22,7 +22,8 @@ const userSchema = new Schema<IUser>({
     default: "user",
   },
   isDeleted: {
-    type: Boolean
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true,
@@ -46,5 +47,10 @@ userSchema.pre<IUser>('save', async function (next) {
     next();
 });
 
+userSchema.methods.toJSON = function() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 
 export default model<IUser>("User", userSchema);

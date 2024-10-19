@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { IUser } from '../interfaces'
-import { JWT_EXPIRES_IN, JWT_SECRET_KEY } from '@configs';
+import { JWT_SECRET_KEY } from '@configs';
 
 export const generateToken = async (payload: Partial<IUser>, expiresIn: string) => {
     return jwt.sign(payload, JWT_SECRET_KEY, { expiresIn })
@@ -12,7 +12,7 @@ export const verifyToken = async (token: string) => {
     if (new Date(<number>decoded?.exp * 1000) <= new Date()) return 'expired'
 
     try {
-        return jwt.verify(token, JWT_EXPIRES_IN)
+        return jwt.verify(token, JWT_SECRET_KEY)
     } catch (e) {
         return 'invalid'
     }

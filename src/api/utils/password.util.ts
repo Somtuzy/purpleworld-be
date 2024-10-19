@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
+import { rounds } from "@configs";
 
 export const hash = async (password: string): Promise<string> => {
-  const salt = await bcrypt.genSalt(parseFloat(<string>process.env.ROUNDS));
+  const salt = await bcrypt.genSalt(rounds);
   return await bcrypt.hash(password, salt);
 };
 

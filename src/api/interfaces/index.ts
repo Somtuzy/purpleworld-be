@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { IUser, ICreateUser, IUpdateUser } from "./user.interface";
 import { UploadApiResponse } from 'cloudinary';
+import { ICategory, ICreateCategory, IUpdateCategory } from './category.interface';
 
 export interface IGenericObject {
     [key: string]: any
@@ -30,10 +31,11 @@ export interface IReqFileUpload {
 
 export type IUpload = IReqFileUpload & UploadApiResponse
 
-export type ICollections = IUser;
+export type ICollections = IUser | ICategory;
 
-export type ICreateCollections = ICreateUser;
+export type ICreateCollections = ICreateUser | ICreateCategory;
 
-export type IUpdateCollections = IUpdateUser;
+export type IUpdateCollections = IUpdateUser | IUpdateCategory;
 
 export * from "./user.interface";
+export * from "./category.interface";

@@ -4,9 +4,10 @@ import {
   NotFoundException,
   ForbiddenException,
   UnAuthorizedException,
+  InternalException,
 } from "./error.service";
 import { IUser, ICreateUser, ILogin } from "@interfaces";
-import { hash, generateToken, verifyHash, logger } from "@utils";
+import { generateToken, verifyHash, logger } from "@utils";
 import { JWT_EXPIRES_IN } from '@configs';
 
 export class AuthService {
@@ -17,40 +18,47 @@ export class AuthService {
   }
 
   async register(payload: ICreateUser) {
-    const { email, password } = payload;
+    const { email } = payload;
 
     const isExistingUser = await this.userService.findOne({ email })
 
     if (isExistingUser) {
-      throw new ForbiddenException("Email not available.");
+      throw new ForbiddenException("This email not available.");
+    }
+    
+    const user = await this.userService.create(payload)
+
+    if (!user) {
+      throw new InternalException()
     }
 
-    payload.password = await hash(password);
-    
-    await this.userService.create(payload)
-
-    const { user, accessToken } = await this.login({ email, password });
+    const accessToken = await generateToken(
+      { _id: user._id },
+      JWT_EXPIRES_IN
+    );
 
     logger.info({ createdUser: user });
 
-    return { user, accessToken };
+    await user.save()
+
+    return { user: user.toJSON(), accessToken };
   }
 
   async login(payload: ILogin) {
     const { email, password } = payload;
-    const isExistingUser = (await this.userService.findOne({ email })) as IUser | null;
+    const isExistingUser = await this.userService.findOne({ email })
 
     if (!isExistingUser) {
       throw new NotFoundException("User Not Found");
     }
     
-    console.log(234, email, password, isExistingUser);
+    console.log(234, email, password, isExistingUser.password, isExistingUser);
     const isValidPassword = await verifyHash(password, isExistingUser.password);
-    if (!isValidPassword)
+    if (!isValidPassword) {
       throw new UnAuthorizedException("Invalid email or password");
+    }
 
-    const user: any = { ...isExistingUser.toObject() };
-    delete user.password;
+    const user = isExistingUser.toJSON()
 
     const accessToken = await generateToken(
       { _id: user._id },

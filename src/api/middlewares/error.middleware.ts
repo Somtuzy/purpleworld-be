@@ -8,14 +8,15 @@ export default (
   res: Response,
   next: NextFunction
 ) => {
-  const details = {
+  const data = {
     name: error.name,
     stack: error.stack,
-    // details: error.details
+    details: (error as any).details?.[0]
   }
 
-  const statusCode = error?.statusCode || 500
+  const statusCode = error.name === "ValidationError" ? 422 : error?.statusCode || 500
+
+  logger.error({ errorDetails: data });
   
-  logger.error({ errorDetails: error });
-  return sendResponse(res, statusCode, false, error.message, details);
+  return sendResponse(res, statusCode, false, error.message, data)
 };

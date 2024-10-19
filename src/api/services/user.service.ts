@@ -7,13 +7,17 @@ import {
   UnAuthorizedException,
   InternalException
 } from "./error.service";
-import { IGenericObject, IUpdateUser, IUser } from "@interfaces";
+import { ICreateUser, IGenericObject, IUpdateUser, IUser } from "@interfaces";
 import { verifyHash, isAuthorised } from "@utils";
 
 export class UserService<T extends IUser> extends GenericService<T> {
   constructor(model: Model<T>) {
     super(model);
     this.model = model;
+  }
+
+  async create(data: T | ICreateUser) {
+    return new this.model(data);
   }
 
   async editUser(id: string, user: IUser, payload: IUpdateUser) {
@@ -46,15 +50,13 @@ export class UserService<T extends IUser> extends GenericService<T> {
     }
 
     const updatedUser = await this.updateOne({ _id: id }, payload);
-    if (!updatedUser)
-      throw new ForbiddenException("Your profile update failed");
-
-    const data: any = updatedUser.toObject();
-    delete data.password;
+    if (!updatedUser) {
+      throw new InternalException();
+    }
 
     return {
-      message: `Your profile was updated successfully! Please reset your password if this wasn't done by you`,
-      data: updatedUser
+      message: `User updated successfully!`,
+      user: updatedUser.toJSON()
     };
   }
 
@@ -74,20 +76,16 @@ export class UserService<T extends IUser> extends GenericService<T> {
     );
 
     if (!updatedUser) {
-      throw new InternalException("Your avatar was not updated")
+      throw new InternalException()
     }
-
-    const data: IGenericObject = updatedUser.toObject();
-    delete data.password;
 
     return {
       message: `Avatar updated successfully`,
-      data: updatedUser
+      user: updatedUser.toJSON()
     }
   }
 
-  async disableUser(user: IUser) {
-    const { _id } = user
+  async disableUser(_id: string, user: IUser) {
     const existingUser = await this.findOne({ _id });
 
     if (!existingUser) {
@@ -95,7 +93,7 @@ export class UserService<T extends IUser> extends GenericService<T> {
     }
 
     const isUnAuthorised = !isAuthorised(user, "_id", existingUser._id.toString()) &&
-      !isAuthorised(user, "role", "coordinator")
+      !isAuthorised(user, "role", "admin")
 
     if (isUnAuthorised) {
       throw new UnAuthorizedException(`You do not have permission to delete this user`)
@@ -106,12 +104,9 @@ export class UserService<T extends IUser> extends GenericService<T> {
       throw new InternalException("There was an error disabling user")
     }
 
-    const data: IGenericObject = disabledUser.toObject();
-    delete data.password;
-
     return {
-      message: `Your account was disabled. Please let us know if this was a mistake`,
-      data
+      message: `Account disabled successfully!`,
+      user: disabledUser.toJSON()
     }
   }
 
@@ -124,12 +119,12 @@ export class UserService<T extends IUser> extends GenericService<T> {
 
     return {
       message: `User fetched successfully!`,
-      data: isExistingUser
+      user: isExistingUser
     }
   }
 
   async getUsers(query: any) {
-    const { id, fullName, deleted } = query;
+    const { id, fullName, isDeleted } = query;
 
     if (id) {
       delete query.id;
@@ -143,8 +138,8 @@ export class UserService<T extends IUser> extends GenericService<T> {
       };
     }
 
-    if (typeof deleted === "boolean") {
-      query.deleted = deleted;
+    if (typeof isDeleted === "boolean") {
+      query.isDeleted = isDeleted;
     }
 
     const {
@@ -154,12 +149,12 @@ export class UserService<T extends IUser> extends GenericService<T> {
     } = await this.findAll(query);
 
     if (!users) {
-      throw new InternalException("There was a problem fetching users.")
+      throw new InternalException()
     }
 
     return {
       message: "Users successfully fetched",
-      data: users,
+      users,
       currentPage,
       totalPages
     }

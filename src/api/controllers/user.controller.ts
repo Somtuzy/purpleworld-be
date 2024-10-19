@@ -8,7 +8,7 @@ class UserController {
     const { id } = req.params;
     const user = req.user as unknown as IUser;
 
-    const { message, data }  = await userService.editUser(id, req.body, user);
+    const { message, user: data }  = await userService.editUser(id, user, req.body);
 
     return sendResponse(res, 200, true, message, data);
   }
@@ -18,32 +18,33 @@ class UserController {
     const { uploads } = req.body;
     const user = req.user as unknown as IUser;
 
-    const { message, data }  = await userService.uploadAvatar(id, user, uploads);
+    const { message, user: data }  = await userService.uploadAvatar(id, user, uploads);
 
     return sendResponse(res, 200, true, message, data);
   }
 
   async disableUser(req: Request, res: Response) {
+    const { id } = req.params
     const user = req.user as unknown as IUser;
 
-    const { message, data } = await userService.disableUser(user);
+    const { message, user: data } = await userService.disableUser(id, user);
 
     return sendResponse(res, 200, true, message, data);
   }
 
   async getUser(req: Request, res: Response) {
     const { id } = req.params
-    const { message, data } = await userService.getUser(id);
+    const { message, user: data } = await userService.getUser(id);
 
     return sendResponse(res, 200, true, message, data);
   }
 
   // Getting all users
   async getUsers(req: Request, res: Response) {
-    const { message, data, currentPage, totalPages } = await userService.getUsers(req.query)
+    const { message, users, currentPage, totalPages } = await userService.getUsers(req.query)
 
     return sendResponse(res, 200, true, message, {
-      data,
+      users,
       currentPage,
       totalPages,
     });

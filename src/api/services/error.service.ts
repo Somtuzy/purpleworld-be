@@ -11,23 +11,23 @@ export class AppError extends Error {
 
 export class NotFoundException extends AppError {
     constructor(message?: string) {
-        super("Resource Not Found", message || 'Resource does not exist.', 404)
+        super("ResourceNotFound", message || 'Resource does not exist.', 404)
     }
 }
 
 export class ForbiddenException extends AppError {
     constructor(message?: string) {
-        super("Operation Not Allowed", message || 'You are not allowed to perform this action', 403)
+        super("OperationNotAllowed", message || 'You are not allowed to perform this action.', 403)
     }
 }
 export class UnAuthorizedException extends AppError {
     constructor(message?: string) {
-        super("Unauthorised Operation", message || 'You are not authorised to perform this action', 401)
+        super("UnauthorizedOperation", message || 'You are not authorized to perform this action.', 401)
     }
 }
 
 export class InternalException extends AppError {
-    constructor(message: string) {
-        super("Internal Server Error", "Something went wrong. Please try again.", 500)
+    constructor(message?: string) {
+        super("Internal Server Error", "There was a temporary problem completing your request. Please try again.", 500)
     }
 }
