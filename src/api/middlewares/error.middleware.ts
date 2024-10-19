@@ -11,7 +11,7 @@ export default (
   const details = {
     name: error.name,
     stack: error.stack,
-    details: error.details
+    // details: error.details
   }
 
   const statusCode = error?.statusCode || 500
