@@ -45,21 +45,13 @@ export class CategoryService<T extends ICategory> extends GenericService<T> {
     async editCategory(_id: string, user: IUser, payload: IUpdateCategory) {
         const { title } = payload;
 
-        let query;
-
-        if (title) {
-            query = { $or: [{ _id }, { title }] } // Ensure we check the category by its ID & check if another category has the same title
-        } else {
-            query = { _id }
-        }
-
-        const isExistingCategory = await this.findOne(query)
-
+        const isExistingCategory = await this.findOne({ _id })
+        
         if (!isExistingCategory) {
-            throw new NotFoundException(`This Category does not exist`);
+            throw new NotFoundException(`This category does not exist`);
         }
 
-        if (!isAuthorised(user, "_id", isExistingCategory._id.toString())) {
+        if (!isAuthorised(user, "role", "admin")) {
             throw new ForbiddenException(
                 `You do not have permission to update this category`
             );
@@ -69,10 +61,12 @@ export class CategoryService<T extends ICategory> extends GenericService<T> {
             throw new ForbiddenException(`Current category name must be different from new name.`);
         }
 
-        if (isExistingCategory._id.toString() !== _id) {
-            throw new ForbiddenException(`A category with this title already exists.`);
+        if (title) {
+            const isConflictingTitle = await this.findOne({ title, _id: { $ne: _id } });
+            if (isConflictingTitle) {
+                throw new ForbiddenException(`A category with this title already exists.`);
+            }
         }
-
 
         const updatedCategory = await this.updateOne({ _id }, payload);
         if (!updatedCategory) {
@@ -124,16 +118,16 @@ export class CategoryService<T extends ICategory> extends GenericService<T> {
     }
 
     async getCategories(query: any) {
-        const { id, fullName, isDeleted } = query;
+        const { id, title, isDeleted } = query;
 
         if (id) {
             delete query.id;
             query._id = id;
         }
 
-        if (fullName) {
-            query.fullName = {
-                $regex: (fullName as string).toLowerCase().trim(),
+        if (title) {
+            query.title = {
+                $regex: (title as string).toLowerCase().trim(),
                 $options: "i",
             };
         }
@@ -153,7 +147,7 @@ export class CategoryService<T extends ICategory> extends GenericService<T> {
         }
 
         return {
-            message: "Categorys successfully fetched",
+            message: "Categories successfully fetched",
             categories,
             currentPage,
             totalPages

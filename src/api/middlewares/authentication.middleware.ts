@@ -31,7 +31,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     return sendResponse(res, 404, false, 'User not found')
   }
 
-  req.user = user as unknown as IUser;
+  req.user = user.toJSON() as unknown as IUser;
   console.log({ authenticatedUser: req.user });
 
   next();

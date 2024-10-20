@@ -39,16 +39,25 @@ class GenericService<T extends Document> {
             .select(fields);
     }
 
+    async find(filter: FilterQuery<T>, fields?: string) {
+        fields = fields ? `-__v -updatedAt ${fields}` : `-__v -updatedAt `
+        filter = { isDeleted: false, ...filter }
+        return await this.model.find(filter)
+            .select(fields);
+    }
+
     async findOneToDelete(filter: FilterQuery<T>) {
         return await this.model.findOne(filter)
     }
 
     async findAll(filter: FilterQuery<T>, fields?: string) {
-        fields = fields ? `-__v -updatedAt -isisDeleted ${fields}` : `-__v -updatedAt -isisDeleted`
-        const page = filter?.page ? parseInt(filter?.page) : 1;
-        const resourcePerPage = filter?.limit ? parseInt(filter?.limit) : 10;
+        const { sort, page, limit } = filter
+        fields = fields ? `-__v -updatedAt -isDeleted ${fields}` : `-__v -updatedAt -isDeleted`
+        const currentPage = page ? parseInt(page) : 1;
+        const resourcePerPage = limit ? parseInt(limit) : 10;
 
         delete filter?.page
+        delete filter?.sort
         delete filter?.limit
 
         let data: Document<unknown, object, ICollections>[];
@@ -61,22 +70,22 @@ class GenericService<T extends Document> {
 
             totalCount = await this.model.countDocuments(filter);
             data = await this.model.find(filter)
-                .skip((page - 1) * resourcePerPage)
+                .skip((currentPage - 1) * resourcePerPage)
                 .limit(resourcePerPage)
-                .sort({ createdAt: 1 })
+                .sort(sort || { createdAt: 1 })
                 .select(fields);
         } else {
             totalCount = await this.model.countDocuments({ isDeleted: false });
             data = await this.model.find({ isDeleted: false })
-                .skip((page - 1) * resourcePerPage)
+                .skip((currentPage - 1) * resourcePerPage)
                 .limit(resourcePerPage)
-                .sort({ createdAt: 1 })
+                .sort(sort || { createdAt: 1 })
                 .select(fields);
         }
 
         return {
             data,
-            currentPage: page,
+            currentPage,
             totalPages: Math.ceil(totalCount / resourcePerPage)
         };
     }

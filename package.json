@@ -1,7 +1,7 @@
 {
-  "name": "e-api",
+  "name": "purpleworld",
   "version": "1.0.0",
-  "description": "The E App",
+  "description": "Purpleworld",
   "main": "dist/api/server.js",
   "scripts": {
     "dev": "nodemon",
@@ -24,6 +24,7 @@
     "@types/morgan": "^1.9.6",
     "@types/multer": "^1.4.9",
     "@types/nodemailer": "^6.4.13",
+    "@types/uuid": "^10.0.0",
     "bun-types": "latest",
     "dotenv": "^16.3.1",
     "globals": "^15.6.0",
@@ -52,7 +53,8 @@
     "nodemailer": "^6.9.6",
     "path": "^0.12.7",
     "pino": "^8.16.0",
-    "tsc-alias": "^1.8.10"
+    "tsc-alias": "^1.8.10",
+    "uuid": "^10.0.0"
   },
   "repository": {
     "type": "git",

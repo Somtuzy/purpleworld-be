@@ -1,6 +1,5 @@
 import { Schema, model } from "mongoose";
 import { ICategory } from "@interfaces";
-import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const categorySchema = new Schema<ICategory>({
   title: {
@@ -28,7 +27,5 @@ const categorySchema = new Schema<ICategory>({
     virtuals: true
   }
 });
-
-categorySchema.plugin(mongooseAutoPopulate);
 
 export default model<ICategory>("Category", categorySchema);

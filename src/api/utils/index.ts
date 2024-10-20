@@ -1,5 +1,5 @@
 export { default as getRoute, isHome } from "./get_route.util";
-export { default as validateObjectId } from "./id.util";
+export * from "./id.util";
 export { default as logger } from "./logger.util";
 export { hash, verifyHash } from "./password.util";
 export { default as sendResponse } from "./response.util";

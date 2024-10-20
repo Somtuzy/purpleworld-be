@@ -1,6 +1,5 @@
 import { Schema, model } from "mongoose";
 import { IUser } from "@interfaces";
-import mongooseAutoPopulate from "mongoose-autopopulate";
 import { hash } from "@utils";
 
 const userSchema = new Schema<IUser>({
@@ -34,8 +33,6 @@ const userSchema = new Schema<IUser>({
     virtuals: true
   }
 });
-
-userSchema.plugin(mongooseAutoPopulate);
 
 userSchema.pre<IUser>('save', async function (next) {
   if (!this.isModified('password')) {

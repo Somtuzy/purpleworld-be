@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { checkForRequiredInput, validateObjectId } from '@utils'
+import { checkForRequiredInput, checkMongooseId } from '@utils'
 
 export const UserSchemas = {
     email: Joi.string().email().label('Email').messages({
@@ -40,8 +40,8 @@ export const UserSchemas = {
             'string.max': 'New Password must have at most 50 characters.',
             'any.required': 'New Password is required.'
         }),
-    id: Joi.string().custom(validateObjectId),
-    _id: Joi.string().custom(validateObjectId)
+    id: Joi.string().custom(checkMongooseId),
+    _id: Joi.string().custom(checkMongooseId)
 }
 
 export const UserFields = {

@@ -2,6 +2,8 @@ import { Request } from 'express'
 import { IUser, ICreateUser, IUpdateUser } from "./user.interface";
 import { UploadApiResponse } from 'cloudinary';
 import { ICategory, ICreateCategory, IUpdateCategory } from './category.interface';
+import { ICreateProduct, IProduct, IUpdateProduct } from './product.interface';
+import { ICreateOrder, IOrder, IUpdateOrder } from './order.interface';
 
 export interface IGenericObject {
     [key: string]: any
@@ -31,11 +33,13 @@ export interface IReqFileUpload {
 
 export type IUpload = IReqFileUpload & UploadApiResponse
 
-export type ICollections = IUser | ICategory;
+export type ICollections = IUser | ICategory | IProduct | IOrder;
 
-export type ICreateCollections = ICreateUser | ICreateCategory;
+export type ICreateCollections = ICreateUser | ICreateCategory | ICreateProduct | ICreateOrder;
 
-export type IUpdateCollections = IUpdateUser | IUpdateCategory;
+export type IUpdateCollections = IUpdateUser | IUpdateCategory | IUpdateProduct | IUpdateOrder;
 
 export * from "./user.interface";
 export * from "./category.interface";
+export * from "./product.interface";
+export * from "./order.interface";

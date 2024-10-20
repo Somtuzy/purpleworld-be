@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import { checkMongooseId } from '@utils'
 
-export const CategorySchemas = {
+export const ProductSchemas = {
     title: Joi.string()
         .min(2)
         .max(30)
@@ -33,42 +33,50 @@ export const CategorySchemas = {
         }),
     isDeleted: Joi.boolean(),
     page: Joi.number(),
+    sortBy: Joi.string(),
+    order: Joi.string(),
     limit: Joi.number(),
+    category: Joi.string().custom(checkMongooseId),
     id: Joi.string().custom(checkMongooseId),
     _id: Joi.string().custom(checkMongooseId)
 }
 
-export const CategoryFields = {
-    CreateCategory: {
+export const ProductFields = {
+    CreateProduct: {
         body: [
             "title*",
             "description*",
+            "category*",
             "icon*"
         ],
     },
-    GetOneCategory: {
+    GetOneProduct: {
         params: ["id*"]
     },
-    UpdateOneCategory: {
+    UpdateOneProduct: {
         body: [
             "title",
             "description",
+            "category",
             "icon"
         ],
         params: ["id*"]
     },
-    DeleteOneCategory: {
+    DeleteOneProduct: {
         params: [
             "id*"
         ]
     },
-    GetAllCategories: {
+    GetAllProducts: {
         query: [
             "id",
             "_id",
             "title",
+            "category",
             "page",
-            "limit"
+            "limit",
+            "sortBy",
+            "order"
         ]
     }
 }
