@@ -157,7 +157,7 @@ export class ProductService<T extends IProduct> extends GenericService<T> {
                     $options: "i"
                 }
             }, '_id');
-
+            
             if (!isExistingCategory) {
                 // Skip the product query if no category found
                 return {
