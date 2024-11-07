@@ -32,7 +32,7 @@ class AuthenticationController {
       return sendResponse(res, 403, false, MESSAGES.ALREADY_LOGGED_OUT);
     }
 
-    res.clearCookie("accessToken")
+    res.clearCookie("accessToken", { httpOnly: true, path: "/" })
 
     return sendResponse(res, 200, true, MESSAGES.LOGOUT_SUCCESSFUL);
   }
