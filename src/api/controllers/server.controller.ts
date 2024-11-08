@@ -21,7 +21,6 @@ class ServerController {
 
     redirectToHome = (req: Request, res: Response, next: NextFunction) => {
         if (isHome(req)) this.redirect(`/api/v1`, res)
-        next()
     }
 
     ping = async (req: Request, res: Response) => {

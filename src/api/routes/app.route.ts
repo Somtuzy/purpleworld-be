@@ -12,5 +12,5 @@ export default (app: Application) => {
   app.use(`${apiVersion}/products`, productRouter);
   app.use(`${apiVersion}/orders`, orderRouter);
   app.use(`${apiVersion}/files`, uploadRouter);
-  app.use(`/`, serverRouter);
+  app.use(serverRouter);
 };
