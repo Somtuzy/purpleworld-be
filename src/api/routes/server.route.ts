@@ -8,7 +8,7 @@ serverRouter.get('/ping', serverController.ping);
 
 serverRouter.get(
     '/', 
-    serverController.redirectToHome
+    serverController.sayWelcome
 );
 
 serverRouter.get(

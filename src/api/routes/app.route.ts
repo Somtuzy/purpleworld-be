@@ -4,7 +4,6 @@ import { serverController } from '@controllers';
 import { authRouter, userRouter, uploadRouter, serverRouter, categoryRouter, productRouter, orderRouter } from '.';
 
 export default (app: Application) => {
-  app.use(`${apiVersion}`, serverController.sayWelcome);
   app.use(`${apiVersion}/health`, serverController.checkHealth);
   app.use(`${apiVersion}/auth`, authRouter);
   app.use(`${apiVersion}/users`, userRouter);
@@ -12,5 +11,6 @@ export default (app: Application) => {
   app.use(`${apiVersion}/products`, productRouter);
   app.use(`${apiVersion}/orders`, orderRouter);
   app.use(`${apiVersion}/files`, uploadRouter);
-  app.use(serverRouter);
+  app.use(`${apiVersion}`, serverRouter);
+  app.use(`/`, serverController.redirectToHome);
 };
