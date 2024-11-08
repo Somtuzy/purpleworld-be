@@ -12,11 +12,6 @@ serverRouter.get(
 );
 
 serverRouter.get(
-    `${apiVersion}`, 
-    serverController.sayWelcome
-);
-
-serverRouter.get(
     '/health', 
     serverController.checkHealth
 );

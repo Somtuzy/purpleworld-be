@@ -20,7 +20,7 @@ class ServerController {
     redirect = (url: string, res: Response) => res.redirect(301, url)
 
     redirectToHome = (req: Request, res: Response, next: NextFunction) => {
-        if (isHome(req)) this.redirect('/api/v1', res)
+        if (isHome(req)) this.redirect(`/api/v1`, res)
         next()
     }
 
