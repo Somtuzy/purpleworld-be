@@ -5,7 +5,7 @@
   "main": "dist/api/server.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc && tsc-alias",
+    "build": "npm install ci && tsc && tsc-alias",
     "start": "node -r dotenv/config dist/api/server.js",
     "bun": "bun run --watch src/api/server.ts"
   },
