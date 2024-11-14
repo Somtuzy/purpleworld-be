@@ -34,10 +34,10 @@ export const OrderSchemas = {
         id: Joi.string().custom(checkMongooseId),
         _id: Joi.string().custom(checkMongooseId),
         title: Joi.string(),
-        description: Joi.string(),
-        icon: Joi.string(),
+        // description: Joi.string(),
+        // icon: Joi.string(),
         price: Joi.number(),
-        category: Joi.object(),
+        // category: Joi.object(),
         quantity: Joi.number(),
         subtotal: Joi.number()
     })),
