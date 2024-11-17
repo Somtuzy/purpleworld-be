@@ -1,35 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
 import {
-  verifyToken,
-  sendResponse
+  sendResponse,
+  decodeUser,
+  extractHeader,
+  extractCookie
 } from '@utils';
-import { userService } from '@services'
 import { IUser } from '@interfaces';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  const authHeaders = req.header('Authorization');
-  const token = authHeaders &&
-    authHeaders.substring(0, 7) === 'Bearer ' ? authHeaders.replace('Bearer ', '') : req.cookies?.token;
+  const accessTokenHeader = await extractHeader(req, 'Authorization')
+  const accessTokenCookie = await extractCookie(req, "accessToken")
 
-  if (!token) {
+  const accessToken = accessTokenHeader || accessTokenCookie
+
+  if (!accessToken) {
     return sendResponse(res, 403, false, 'Login to continue')
   }
 
-  const decoded = <JwtPayload | string>await verifyToken(token)
-
-  if (decoded === 'expired') {
-    return sendResponse(res, 403, false, 'Session expired. Sign in again to continue.')
-  }
-
-  if (decoded === 'invalid') {
-    return sendResponse(res, 401, false, 'Invalid token.')
-  }
-
-  const user = await userService.findOne({ _id: (decoded as JwtPayload)._id });
-  if (!user) {
-    return sendResponse(res, 404, false, 'Authentication failed. The associated user account no longer exists. Please log in again or contact support if this is unexpected.')
-  }
+  const user = await decodeUser(accessToken)
 
   req.user = user.toJSON() as unknown as IUser;
   console.log({ authenticatedUser: req.user });
