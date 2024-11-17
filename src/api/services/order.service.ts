@@ -35,12 +35,12 @@ export class OrderService<T extends IOrder> extends GenericService<T> {
             }
         }
 
-        payload.items = items.map(item => (item as IOrderItem)._id)
         let userId: string | null = null
 
         if(accessToken) {
             userId = (await decodeUser(accessToken))._id
-        } 
+        }
+        
         payload.user = userId
 
         const total = items.reduce((previousValue, item) => {
