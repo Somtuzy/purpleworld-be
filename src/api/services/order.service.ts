@@ -1,11 +1,10 @@
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { Order } from "@models";
 import GenericService from "./generic.service";
 import productService from "./product.service";
 import {
     NotFoundException,
     ForbiddenException,
-    UnAuthorizedException,
     InternalException
 } from "./error.service";
 import { IUpdateOrder, IOrder, IUser, ICreateOrder } from "@interfaces";
@@ -19,7 +18,6 @@ export class OrderService<T extends IOrder> extends GenericService<T> {
 
     async generateReference() {
         const reference = generateUniqueId()
-        console.log(reference);
         
         return {
             message: `Reference generated successfully!`,
@@ -84,11 +82,11 @@ export class OrderService<T extends IOrder> extends GenericService<T> {
             throw new NotFoundException(`Order does not exist.`)
         }
 
-        const isUnAuthorised = !isAuthorised(user, "_id", existingOrder._id.toString()) &&
+        const isUnAuthorised = !isAuthorised(user, "_id", (existingOrder.user as Types.ObjectId)?._id.toString()) &&
             !isAuthorised(user, "role", "admin")
 
         if (isUnAuthorised) {
-            throw new UnAuthorizedException(`You do not have permission to delete this order`)
+            throw new ForbiddenException(`You do not have permission to delete this order`)
         }
 
         const disabledOrder = await this.disableOne({ _id });
@@ -109,11 +107,11 @@ export class OrderService<T extends IOrder> extends GenericService<T> {
             throw new NotFoundException(`Order does not exist.`)
         }
 
-        const isUnAuthorised = !isAuthorised(user, "_id", isExistingOrder._id.toString()) &&
+        const isUnAuthorised = !isAuthorised(user, "_id", (isExistingOrder.user as Types.ObjectId)?._id.toString()) &&
             !isAuthorised(user, "role", "admin")
 
         if (isUnAuthorised) {
-            throw new UnAuthorizedException(`You do not have permission to see this order`)
+            throw new ForbiddenException(`You do not have permission to see this order`)
         }
 
         return {
@@ -131,14 +129,17 @@ export class OrderService<T extends IOrder> extends GenericService<T> {
         }
 
         if (reference) {
-            query.reference = {
-                $regex: (reference as string).toLowerCase().trim(),
-                $options: "i",
-            };
+            query.reference = (reference as string).toLowerCase().trim()
         }
 
         if (typeof isDeleted === "boolean") {
             query.isDeleted = isDeleted;
+        }
+
+        const isAdmin = isAuthorised(user, "role", "admin")
+
+        if (!isAdmin) {
+            query.user = user._id
         }
 
         let sort: { [key: string]: number } | null = {};

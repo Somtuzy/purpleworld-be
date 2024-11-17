@@ -17,7 +17,7 @@ orderRouter.post(
 orderRouter.get(
     "/ref",
     [
-        authenticate,
+        // authenticate,
         // validate(OrderSchemas, OrderFields.CreateOrder)
     ],
     orderController.getRef

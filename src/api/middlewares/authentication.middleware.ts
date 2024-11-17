@@ -28,7 +28,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   const user = await userService.findOne({ _id: (decoded as JwtPayload)._id });
   if (!user) {
-    return sendResponse(res, 404, false, 'User not found')
+    return sendResponse(res, 404, false, 'Authentication failed. The associated user account no longer exists. Please log in again or contact support if this is unexpected.')
   }
 
   req.user = user.toJSON() as unknown as IUser;
